@@ -280,6 +280,9 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
                 f'Logging results to {save_dir}\n'
                 f'Starting training for {epochs} epochs...')
     for epoch in range(start_epoch, epochs):  # epoch ------------------------------------------------------------------
+        
+        if epoch - start_epoch >= 5:
+            raise Exception('Terminó')
         model.train()
 
         # Update image weights (optional)
