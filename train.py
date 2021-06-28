@@ -132,7 +132,10 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
     test_path = data_dict['val']
 
     # Freeze
-    freeze = []  # parameter names to freeze (full or partial)
+    if opt.frozen_layers <24:
+        freeze = ['model.%s.' % x for x in range(opt.frozen_layers)]  # parameter names to freeze (full or partial)
+    else:
+        freeze = []
     for k, v in model.named_parameters():
         v.requires_grad = True  # train all layers
         if any(x in k for x in freeze):
@@ -281,7 +284,7 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
                 f'Starting training for {epochs} epochs...')
     for epoch in range(start_epoch, epochs):  # epoch ------------------------------------------------------------------
         
-        if epoch - start_epoch >= 5:
+        if epoch - start_epoch >= opt.epochs_per_session:
             raise Exception('Terminó')
         model.train()
 
@@ -517,6 +520,8 @@ def parse_opt(known=False):
     parser.add_argument('--save_period', type=int, default=-1, help='Log model after every "save_period" epoch')
     parser.add_argument('--artifact_alias', type=str, default="latest", help='version of dataset artifact to be used')
     parser.add_argument('--local_rank', type=int, default=-1, help='DDP parameter, do not modify')
+    parser.add_argument('--epochs-per-session', type=int, default=5, help='Epochs per session')
+    parser.add_argument('--frozen-layers',type=int,default=30,help='Congelar capas, 30 para no congelar')
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
     return opt
 
